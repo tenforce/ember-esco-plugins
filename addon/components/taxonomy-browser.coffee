@@ -187,6 +187,8 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     if target and display
       @get('hierarchyService').getAncestors(display.id, target, (not filter.filter)).then (expanded) =>
         expanded = expanded.data.map (item) -> item.id
+    else if display
+      new Ember.RSVP.Promise (resolve) -> resolve([])
     else
       null
   
