@@ -111,7 +111,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       promises = idslists.map (list) =>
         @get('store').query 'concept',
           filter: {id: list.join(',')}
-          include: "pref-labels"
+          include: "pref-labels.pref-label-of"
       Ember.RSVP.all(promises).then (lists) ->
         result = []
         lists.map (list) ->
