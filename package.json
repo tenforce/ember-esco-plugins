@@ -34,7 +34,7 @@
     "ember-disable-proxy-controllers": "^1.0.1",
     "ember-export-application-global": "^1.0.4",
     "ember-resolver": "^2.0.3",
-    "ember-keyboard-shortcuts": "0.3.0",
+    "ember-keyboard-shortcuts": "https://github.com/asjongers/ember-keyboard-shortcuts.git#v0.3.1",
     "ember-try": "~0.0.8",
     "ember-cli-htmlbars": "^1.0.1",
     "ember-cli-coffeescript": "1.13.2"
@@ -44,6 +44,7 @@
   ],
   "dependencies": {
     "ember-cli-babel": "^5.1.5",
+    "ember-keyboard-shortcuts": "https://github.com/asjongers/ember-keyboard-shortcuts.git#v0.3.1",
     "ember-cli-htmlbars": "^1.0.1",
     "ember-cli-coffeescript": "1.13.2",
     "ember-promise-helpers": "1.0.1"

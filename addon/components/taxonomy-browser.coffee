@@ -117,7 +117,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
         lists.map (list) ->
           list.map (item) ->
             result.push item
-        sortByPromise(Ember.ArrayProxy.create(content: result), sortkey)
+        Ember.ArrayProxy.create(content: result)
 
   # the top concepts of the taxonomy
   topConcepts: Ember.computed 'taxonomy', 'taxonomy.children', 'sortKey', 'defaultExpanded', ->
@@ -160,7 +160,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       expandedConcepts: @get('defaultExpanded') or []
       getChildren: (model) =>
         @fetchChildren(display.id, model.get('id'), filter).then (children) =>
-          if children.length > 0
+          if Ember.get(children, 'length') > 0
             model.set('anyChildren', true)
           else
             model.set('anyChildren', false)
