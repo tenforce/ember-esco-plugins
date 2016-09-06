@@ -35,6 +35,7 @@
     "ember-export-application-global": "^1.0.4",
     "ember-resolver": "^2.0.3",
     "ember-keyboard-shortcuts": "https://github.com/asjongers/ember-keyboard-shortcuts.git#v0.3.1",
+    "ember-async-expanding-tree": "git+ssh://git@git.tenforce.com:ember/async-expanding-tree.git#v1.1.1",
     "ember-try": "~0.0.8",
     "ember-cli-htmlbars": "^1.0.1",
     "ember-cli-coffeescript": "1.13.2"

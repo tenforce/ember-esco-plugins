@@ -152,7 +152,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     @get 'filterType'
     @notifyPropertyChange 'topConcepts'
 
-  config: Ember.computed 'baseConfig', 'defaultExpanded', ->
+  config: Ember.computed 'baseConfig', 'defaultExpanded', 'taxonomy', 'displayType', 'filterType', ->
     filter = @get 'filterType'
     display = @get 'displayType'
     base = @get 'baseConfig' or {}
