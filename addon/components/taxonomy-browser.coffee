@@ -103,7 +103,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     filter = @get('filterType')
     @get('hierarchyService').getChildren(display,target, filter).then (result) =>
       idslists = []
-      sortkey = @get 'sortKey'
       result.data.map (node, index) =>
         listIndex = Math.floor(index / 40)
         idslists[listIndex] ||= []
@@ -157,6 +156,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     display = @get 'displayType'
     base = @get 'baseConfig' or {}
     Ember.Object.create base,
+      sortBy: @get('sortKey')
       expandedConcepts: @get('defaultExpanded') or []
       getChildren: (model) =>
         @fetchChildren(display.id, model.get('id'), filter).then (children) =>
