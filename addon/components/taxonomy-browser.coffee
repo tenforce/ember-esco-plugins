@@ -87,6 +87,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   # whether or not we are searching right now
   searchActive: false
 
+  included: Ember.computed 'baseConfig.included', ->
+    @get('baseConfig.included') or 'pref-labels.pref-label-of'
+
   # ensures the list view is shown when searching
   ensureListWhenSearching: Ember.observer 'searchActive', 'displayTypes', ->
     Ember.run.later =>
@@ -110,7 +113,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       promises = idslists.map (list) =>
         @get('store').query 'concept',
           filter: {id: list.join(',')}
-          include: "pref-labels.pref-label-of"
+          include: @get('included')
       Ember.RSVP.all(promises).then (lists) ->
         result = []
         lists.map (list) ->
@@ -227,7 +230,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
 
           store.query('concept',
             filter: {id: ids.join(',')}
-            include: "pref-labels"
+            include: @get('included')
           ).then (items) =>
             idMap = {}
             items.map (item) ->
