@@ -73,7 +73,7 @@
           {{#each (await topConcepts) as |top index|}}
             {{#if top.hasChildren}}
               {{async-expanding-tree model=top config=config fetchChildrenOnInit=true selected=target selectOlderBrother="selectOlderBrother"
-              selectYoungerBrother="selectYoungerBrother" sortchildrenby=sortKey index=index}}
+              selectYoungerBrother="selectYoungerBrother" sortchildrenby=sortKey index=index disableShortcuts=disableShortcuts}}
             {{/if}}
           {{/each}}
         </ul>

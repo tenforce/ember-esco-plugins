@@ -9,16 +9,20 @@
 TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   layout:layout
   classNames: ["hierarchy"]
-  keyboardShortcuts:
-    'up':
-      action: 'up'
-      global: false
-    'down':
-      action: 'down'
-      global: false
-    'ctrl+alt+d':
-      action: 'deleteSearchString'
-      scoped: true
+  keyboardShortcuts: Ember.computed 'disableShortcuts', ->
+    if @get('disableShortcuts') then return {}
+    else
+      {
+        'up':
+          action: 'up'
+          global: false
+        'down':
+          action: 'down'
+          global: false
+        'ctrl+alt+d':
+          action: 'deleteSearchString'
+          scoped: true
+      }
 
   store: Ember.inject.service('store')
   hierarchyService: Ember.inject.service()
