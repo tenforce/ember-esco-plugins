@@ -4,12 +4,9 @@
   </div>
 {{else}}
   <div class="controls">
-    {{search-bar searchString=searchString displaySearchIcon=false displayCancel=true search="search" cancelSearch="cancelSearch" placeholder=searchPlaceholder}}
-    <div class="filter-toggle {{if showFilter 'enabled'}}" {{action "toggleFilter"}} title={{filterTitle}}>
-      <i class="fa fa-sliders"></i>
-    </div>
+    {{search-bar searchString=searchString displaySearchIcon=false displayCancel=true search="search" cancelSearch="cancelSearch" placeholder="Filter"}}
+    <div class="filter-toggle {{if showFilter 'enabled'}}" {{action "toggleFilter"}} title={{filterTitle}}></div>
     {{#if showFilter}}
-      {{yield}}
       <div class="filters">
         <div class="filter display">
           <div class="select">
@@ -28,10 +25,6 @@
         </div>
       </div>
     {{/if}}
-  </div>
-
-  <div class="shadow clearfix">
-    <span></span>
   </div>
 
   <div class="content">
