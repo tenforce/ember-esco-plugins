@@ -27,8 +27,15 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   store: Ember.inject.service('store')
   hierarchyService: Ember.inject.service()
 
+  # number of concepts to preload
+  preloadSize: 5
+
   # page size for hierarchy
-  pageSize: 50
+  pageSize: 15
+
+  fetchSize: Ember.computed 'pageSize', 'maxPage', ->
+    (@get('maxPage')+1)*@get('pageSize')
+
 
   # Language to show the tree in
   language: "en"
@@ -97,13 +104,13 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   # ensures the list view is shown when searching
   ensureListWhenSearching: Ember.observer 'searchActive', 'displayTypes', ->
     Ember.run.later =>
-     if @get 'searchActive'
-       listType = null
-       @get('displayTypes')?.map (display) ->
-         if display.type == "list"
-           listType = display
-       if listType
-         @set 'displayType', listType
+      if @get 'searchActive'
+        listType = null
+        @get('displayTypes')?.map (display) ->
+          if display.type == "list"
+            listType = display
+        if listType
+          @set 'displayType', listType
 
   # fetching the children of the current node
   fetchChildren: (display, target, filter) ->
@@ -151,7 +158,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     else
       @set 'filterType', @filterTypes[0]
       @set 'searchActive', true
-      @performSearch(@get 'searchQuery')
+      @performSearch(@get('searchQuery'), true, true)
 
   # when filtering make sure the top concepts are computed again so the tree is rerendered
   filterTypeObserver: Ember.observer 'filterType', ->
@@ -206,36 +213,41 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   ).on('init')
 
   # perform an actual search
-  performSearch: (query) ->
+  performSearch: (query, reinitialize, preload) ->
     @set 'searchQuery', query
-    @set 'maxPage', 0
-    @set 'searchActive', true
-    store = @get('store')
     if @get 'goodSearchString'
-      @set 'searchLoading', true
-
+      if reinitialize
+        @set 'maxPage', 0
+        @set 'searchActive', true
+        @set 'searchLoading', true
       @_getSearchResults(query).then (data) =>
-          # uuid of the conceptscheme
-          searchOrigin = @get('taxonomy.id')
-          filtered = data.filter (element) =>
-            element?.type?.indexOf(searchOrigin) >= 0
-
-          filtered.sort (a,b) ->
-            if(a?.attributes?.score > b?.attributes?.score)
-              return -1
-            else
-             if(b?.attributes?.score > a?.attributes?.score)
-               return 1
-             else
-               return 0
-
-          ids = filtered.map (item) ->
-            item.id
-
-          store.query('concept',
-            filter: {id: ids.join(',')}
-            include: @get('included')
-          ).then (items) =>
+        ids = @_getIdsFromResultSet(data)
+        if preload
+          immediate = ids.splice(0,@get('preloadSize'))
+          @_fetchConcepts(immediate).then (items) =>
+            idMap = {}
+            items.map (item) ->
+              idMap[item.get('id')] = item
+            orderedItems = []
+            immediate.map (id) ->
+              if idMap[id]
+                orderedItems.push idMap[id]
+            @set 'searchExtraItemsLoading', true
+            @set 'searchLoading', false
+            @set 'searchResults', orderedItems
+            @_fetchConcepts(ids).then (items) =>
+              idMap = {}
+              items.map (item) ->
+                idMap[item.get('id')] = item
+              orderedItems = []
+              ids.map (id) ->
+                if idMap[id]
+                  orderedItems.push idMap[id]
+              @set('searchResults', @get('searchResults').concat(orderedItems))
+              @set 'searchExtraItemsLoading', false
+        else
+          @set 'searchExtraItemsLoading', true
+          @_fetchConcepts(ids).then (items) =>
             idMap = {}
             items.map (item) ->
               idMap[item.get('id')] = item
@@ -243,8 +255,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
             ids.map (id) ->
               if idMap[id]
                 orderedItems.push idMap[id]
-            @set 'searchResults', orderedItems
+            @set('searchResults', orderedItems)
             @set 'searchLoading', false
+            @set 'searchExtraItemsLoading', false
 
         error: ->
           @set 'searchResults', Ember.A()
@@ -255,15 +268,15 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   _getSearchResults: (query) ->
     promises = []
     promises.push Ember.$.ajax
-        url: '/indexer/search/similar',
-        type: 'GET',
-        data: {
-          'conceptScheme': @get('taxonomy.id'),
-          'locale': @get('language'),
-          'text': query,
-          'numberOfResults': @get('pageSize')
-        },
-        contentType: "application/json"
+      url: '/indexer/search/similar',
+      type: 'GET',
+      data: {
+        'conceptScheme': @get('taxonomy.id'),
+        'locale': @get('language'),
+        'text': query,
+        'numberOfResults': @get('fetchSize')+1
+      },
+      contentType: "application/json"
 
     Ember.RSVP.all(promises).then((results) =>
       searched = []
@@ -280,6 +293,37 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       filtered
     ).catch =>
       []
+
+  _getIdsFromResultSet: (data) ->
+  # uuid of the conceptscheme
+    searchOrigin = @get('taxonomy.id')
+    filtered = data.filter (element) =>
+      element?.type?.indexOf(searchOrigin) >= 0
+
+    # Disabled for now, scores are too often the same and the order might change
+    ###filtered.sort (a,b) ->
+      if(a?.attributes?.score > b?.attributes?.score)
+        return -1
+      else
+        if(b?.attributes?.score > a?.attributes?.score)
+          return 1
+        else
+          if a?.attributes?.label > b?.attributes?.label
+            return 1
+          else if(b?.attributes?.label> a?.attributes?.label)
+            return -1
+          return 0###
+
+    ids = filtered.map (item) ->
+      item.id
+    return ids
+
+  _fetchConcepts: (list) ->
+    @get('store').query('concept',
+      filter: {id: list.join(',')}
+      include: @get('included')
+    )
+
   # maximum index to search in search results
   maxIndex: Ember.computed 'pageSize', 'maxPage', ->
     @get('pageSize')*(@get('maxPage')+1)
@@ -320,7 +364,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
           child = topconcepts[0]
           if child?.get('hasChildren') then @sendAction 'activateItem', child
     search: (query) ->
-      @performSearch query
+      @performSearch query, true, true
     activateItem: (item) ->
       @sendAction 'activateItem', item
     toggleFilter: ->
@@ -330,6 +374,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       @set 'displayType', @get 'defaultDisplayType'
     loadMore: ->
       @incrementProperty 'maxPage'
+      @performSearch(@get('searchQuery'), false, false)
       false
     selectOlderBrother: (index) ->
       @get('topConcepts').then (topconcepts) =>
