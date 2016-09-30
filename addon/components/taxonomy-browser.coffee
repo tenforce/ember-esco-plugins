@@ -65,12 +65,12 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   #     name: "In progress",
   #     id: "70d7bd9f-107a-40dd-91f7-9bd210b7e7fc",
   #     params: {
-  #       language: "en", 
-  #       status: "inProgress" 
+  #       language: "en",
+  #       status: "inProgress"
   #     }
   #   }
   # ]
-  filterTypes: [] 
+  filterTypes: []
 
   loading: Ember.computed.not 'displayTypes'
   # the possible ways to display the taxonomy
@@ -104,7 +104,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
            listType = display
        if listType
          @set 'displayType', listType
- 
+
   # fetching the children of the current node
   fetchChildren: (display, target, filter) ->
     filter = @get('filterType')
@@ -134,7 +134,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
 
   # how to sort the top concepts
   sortKey: ["defaultCode", "preflabel"]
-  
+
   # the default display type to use
   defaultDisplayType: Ember.computed 'displayTypes', ->
     displays = @get 'displayTypes'
@@ -171,7 +171,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
             model.set('anyChildren', true)
           else
             model.set('anyChildren', false)
-          children 
+          children
 
   # validate the search string, has to have at least 2 characters
   goodSearchString: Ember.computed 'searchQuery', ->
@@ -185,7 +185,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       target = @get('filterTypes').filterBy('filter', filter)[0]
     @set 'filterType', target or @get('filterTypes')[0]
   ).on('init')
-  
+
   # which concepts are to be expanded automatically
   expanded: Ember.computed 'target','displayType', ->
     target = @get 'target'
@@ -198,7 +198,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       new Ember.RSVP.Promise (resolve) -> resolve([])
     else
       null
-  
+
   expandedObserver: Ember.observer 'expanded', ( ->
     if not @get('defaultExpanded')
       @get('expanded')?.then (result) =>
@@ -218,7 +218,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
           # uuid of the conceptscheme
           searchOrigin = @get('taxonomy.id')
           filtered = data.filter (element) =>
-            element?.attributes?.type?.indexOf(searchOrigin) >= 0
+            element?.type?.indexOf(searchOrigin) >= 0
 
           filtered.sort (a,b) ->
             if(a?.attributes?.score > b?.attributes?.score)
@@ -263,18 +263,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
           'text': query,
           'numberOfResults': @get('pageSize')
         },
-        contentType: "application/json",
-        
-    promises.push Ember.$.ajax
-        url: '/indexer/search/similar',
-        type: 'GET',
-        data: {
-          'conceptScheme': @get('taxonomy.id'),
-          'locale': "en",
-          'text': query,
-          'numberOfResults': @get('pageSize')
-        },
-        contentType: "application/json",
+        contentType: "application/json"
 
     Ember.RSVP.all(promises).then((results) =>
       searched = []
