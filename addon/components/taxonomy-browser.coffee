@@ -268,7 +268,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   _getSearchResults: (query) ->
     promises = []
     promises.push Ember.$.ajax
-      url: '/indexer/search/similar',
+      url: '/indexer/search/textSearch',
       type: 'GET',
       data: {
         'conceptScheme': @get('taxonomy.id'),
