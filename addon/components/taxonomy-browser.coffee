@@ -40,6 +40,10 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   # Language to show the tree in
   language: "en"
 
+  # Language used to search
+  searchLanguage: Ember.computed 'taxonomy', ->
+    @get('taxonomy.locale') || @get('language')
+
   # the target concept being focused on in the hierarchy
   target: Ember.computed.alias 'hierarchyService.target'
 
@@ -272,7 +276,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       type: 'GET',
       data: {
         'conceptScheme': @get('taxonomy.id'),
-        'locale': @get('language'),
+        'locale': @get('searchLanguage'),
         'text': query,
         'numberOfResults': @get('fetchSize')+1
       },
