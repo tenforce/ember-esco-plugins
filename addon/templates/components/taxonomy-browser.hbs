@@ -11,7 +11,7 @@
         <div class="filter display">
           <div class="select">
             {{#power-select options=filterTypes searchField="name" disabled=searchActive selected=filterType onchange=(action (mut filterType))
-              as |filterType|}}
+            as |filterType|}}
               {{filterType.name}}
             {{/power-select}}
           </div>
@@ -40,15 +40,21 @@
               <li class="aet {{if (eq target result.id) 'selected'}}" onclick={{action "activateItem" result}}>
                 <div class="aet-node">
                   <div class="aet-label">
-                    {{await result.preflabel}}
+                    {{component config.beforeComponent model=result config=config}}
+                    <label>{{await result.preflabel}}</label>
                     {{component config.afterComponent model=result config=config}}
                   </div>
                 </div>
               </li>
-        {{else}}
+            {{else}}
               <li class="no-results">No results found for <span>{{searchQuery}}</span></li>
             {{/each}}
           </ul>
+          {{#if searchExtraItemsLoading}}
+            <div class="loading">
+              <i class="fa fa-circle-o-notch fa-spin"></i>
+            </div>
+          {{/if}}
           {{#if canLoadMore}}
             <span class="load-more" {{action "loadMore"}}>Load more</span>
           {{/if}}
