@@ -313,7 +313,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     arr = []
     chunksize=10
     i=0
-    debugger
     while i < list.length
       temp = list.slice(i, i+chunksize)
       promises.push(
