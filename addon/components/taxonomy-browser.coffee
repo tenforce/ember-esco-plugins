@@ -299,34 +299,34 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
       []
 
   _getIdsFromResultSet: (data) ->
-  # uuid of the conceptscheme
+    # uuid of the conceptscheme
     searchOrigin = @get('taxonomy.id')
     filtered = data.filter (element) =>
       element?.type?.indexOf(searchOrigin) >= 0
-
-    # Disabled for now, scores are too often the same and the order might change
-    ###filtered.sort (a,b) ->
-      if(a?.attributes?.score > b?.attributes?.score)
-        return -1
-      else
-        if(b?.attributes?.score > a?.attributes?.score)
-          return 1
-        else
-          if a?.attributes?.label > b?.attributes?.label
-            return 1
-          else if(b?.attributes?.label> a?.attributes?.label)
-            return -1
-          return 0###
 
     ids = filtered.map (item) ->
       item.id
     return ids
 
   _fetchConcepts: (list) ->
-    @get('store').query('concept',
-      filter: {id: list.join(',')}
-      include: @get('included')
-    )
+    promises=[]
+    arr = []
+    chunksize=10
+    i=0
+    debugger
+    while i < list.length
+      temp = list.slice(i, i+chunksize)
+      promises.push(
+        @get('store').query('concept',
+          filter: {id: temp.join(',')}
+          include: @get('included')
+        ).then (results) ->
+          results.forEach (result) ->
+            arr.push(result)
+      )
+      i+=chunksize
+    Ember.RSVP.all(promises).then ->
+      return arr
 
   # maximum index to search in search results
   maxIndex: Ember.computed 'pageSize', 'maxPage', ->
