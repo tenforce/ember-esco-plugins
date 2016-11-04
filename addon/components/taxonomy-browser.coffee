@@ -125,10 +125,20 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
         listIndex = Math.floor(index / 40)
         idslists[listIndex] ||= []
         idslists[listIndex].push node.id
-      promises = idslists.map (list) =>
-        @get('store').query 'concept',
-          filter: {id: list.join(',')}
-          include: @get('included')
+      promises = []
+      idslists.forEach (list) =>
+        chunksize=10
+        i=0
+        while i < list.length
+          temp = list.slice(i, i+chunksize)
+          promises.push(
+            @get('store').query('concept',
+              filter: {id: temp.join(',')}
+              include: @get('included')
+            )
+          )
+          i+=chunksize
+
       Ember.RSVP.all(promises).then (lists) ->
         result = []
         lists.map (list) ->
