@@ -282,7 +282,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   _getSearchResults: (query) ->
     promises = []
     promises.push Ember.$.ajax
-      url: '/indexer/search/textSearch',
+      url: '/indexer/search/similar',
       type: 'GET',
       data: {
         'conceptScheme': @get('taxonomy.id'),
@@ -312,7 +312,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
     # uuid of the conceptscheme
     searchOrigin = @get('taxonomy.id')
     filtered = data.filter (element) =>
-      element?.type?.indexOf(searchOrigin) >= 0
+      element?.attributes?.type?.indexOf(searchOrigin) >= 0
 
     ids = filtered.map (item) ->
       item.id
