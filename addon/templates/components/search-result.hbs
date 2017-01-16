@@ -1,0 +1,13 @@
+<div class="aet-label" {{action 'activateItem' model}} title={{tooltipLabel}}>
+  {{#if beforeComponent}}
+    {{component beforeComponent model=model config=config}}
+  {{/if}}
+  {{#if (and label.then (is-pending label))}}
+    <label>Loading...</label>
+  {{else}}
+    <label>{{if label.then (await label) label}}</label>
+  {{/if}}
+  {{#if afterComponent}}
+    {{component afterComponent model=model config=config}}
+  {{/if}}
+</div>

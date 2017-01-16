@@ -2,11 +2,12 @@
 `import sortByPromise from '../utils/sort-by-promise'`
 `import KeyboardShortcuts from 'ember-keyboard-shortcuts/mixins/component';`
 `import layout from '../templates/components/taxonomy-browser'`
+`import TooltipManager from 'ember-async-expanding-tree/mixins/tooltip-manager';`
 
 ###
 # component to browse and search taxonomies as defined in ESCO
 ###
-TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
+TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipManager,
   layout:layout
   classNames: ["hierarchy"]
   keyboardShortcuts: Ember.computed 'disableShortcuts', ->
@@ -38,11 +39,12 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
 
 
   # Language to show the tree in
-  language: "en"
+  language: undefined
+  defaultLanguage: "en"
 
   # Language used to search
-  searchLanguage: Ember.computed 'taxonomy', ->
-    @get('taxonomy.locale') || @get('language')
+  searchLanguage: Ember.computed 'taxonomy.locale', 'language', ->
+    @get('language') || @get('taxonomy.locale') || @get('defaultLanguage')
 
   # the target concept being focused on in the hierarchy
   target: Ember.computed.alias 'hierarchyService.target'
@@ -86,7 +88,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
   loading: Ember.computed.not 'displayTypes'
   # the possible ways to display the taxonomy
   displayTypesObserver: Ember.observer 'taxonomy', ( ->
-    @fetchHierarchies(@get('taxonomy')).then (displayTypes) =>
+    @fetchHierarchies(@get('taxonomy'))?.then (displayTypes) =>
       @set 'displayTypes', displayTypes
   ).on('init')
 
@@ -349,21 +351,56 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts,
 
   # fetches the hierarchies for a given taxonomy and adds the default hierarchies too
   fetchHierarchies: (taxonomy) ->
-    taxonomy.get('structures').then (structures) =>
-      hierarchyDescriptions = structures.map (item,index) ->
-        name: item.get('name')
-        type: "hierarchy"
-        id: item.get('id')
-      hierarchyDescriptions.push
-        name: "List"
-        type: "list"
-        id: "list"
-      hierarchyDescriptions.push
-        name: taxonomy.get('preflabel')
-        type: "hierarchy"
-        default: true
-        id: taxonomy.get('id')
-      hierarchyDescriptions
+    new Ember.RSVP.Promise (resolve, reject) ->
+      if taxonomy
+        if taxonomy.get('structures').then
+          taxonomy?.get('structures').then (structures) =>
+            hierarchyDescriptions = structures.map (item,index) ->
+              name: item.get('name')
+              type: "hierarchy"
+              id: item.get('id')
+            hierarchyDescriptions.push
+              name: "List"
+              type: "list"
+              id: "list"
+            hierarchyDescriptions.push
+              name: taxonomy.get('preflabel')
+              type: "hierarchy"
+              default: true
+              id: taxonomy.get('id')
+            resolve(hierarchyDescriptions)
+        else
+          resolve(
+            [
+              {
+                name: "List"
+                type: "list"
+                id: "list"
+              },
+              {
+                name: taxonomy.get('preflabel')
+                type: "hierarchy"
+                default: true
+                id: taxonomy.get('id')
+              }])
+      else
+        resolve(
+          [{
+            name: "List"
+            type: "list"
+            id: "list"
+          }])
+
+  labelPropertyPath: Ember.computed.alias 'config.labelPropertyPath'
+  beforeComponent: Ember.computed.alias 'config.beforeComponent'
+  afterComponent: Ember.computed.alias 'config.afterComponent'
+  # we create a dynamic computed property to check when the value of the label is changed
+  setLabel: Ember.observer('labelPropertyPath', 'model', () ->
+    key = "model.#{@get('labelPropertyPath')}"
+    Ember.defineProperty @, "label",
+      Ember.computed 'labelPropertyPath', 'model', key, ->
+        @get("model.#{@get('labelPropertyPath')}")
+  ).on('init')
 
   actions:
     up: ->
