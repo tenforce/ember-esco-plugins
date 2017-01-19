@@ -4,84 +4,100 @@
   </div>
 {{else}}
   <div class="controls">
-    {{search-bar searchString=searchString displaySearchIcon=false displayCancel=true search="search" cancelSearch="cancelSearch" placeholder=searchPlaceholder}}
-    <div class="filter-toggle {{if showFilter 'enabled'}}" {{action "toggleFilter"}} title={{filterTitle}}>
-      <i class="fa fa-sliders"></i>
-    </div>
-    {{#if showFilter}}
-      {{yield}}
-      <div class="filters">
-        {{#if filterTypes.length}}
-          <div class="filter display">
-            <div class="select">
-              {{#power-select options=filterTypes searchField="name" disabled=searchActive selected=filterType onchange=(action (mut filterType))
-              as |filterType|}}
-                {{filterType.name}}
-              {{/power-select}}
-            </div>
-          </div>
-        {{/if}}
-        {{#if displayTypes.length}}
-          <div class="filter view">
-            <div class="select">
-              {{#power-select options=displayTypes searchField="name" selected=displayType onchange=(action (mut displayType)) as |displayType|}}
-                {{displayType.name}}
-              {{/power-select}}
-            </div>
-          </div>
-        {{/if}}
+    {{#unless disableSearch}}
+      {{search-bar searchString=searchString displaySearchIcon=false displayCancel=true search="search" cancelSearch="cancelSearch" placeholder=searchPlaceholder}}
+    {{/unless}}
+    {{#unless disableFilters}}
+        <div class="filter-toggle {{if showFilter 'enabled'}}" {{action "toggleFilter"}} title={{filterTitle}}>
+        <i class="fa fa-sliders"></i>
       </div>
-    {{/if}}
+    {{/unless}}
+    {{#unless disableFilters}}
+      {{#if showFilter}}
+        {{yield}}
+        <div class="filters">
+          {{#if filterTypes.length}}
+            <div class="filter display">
+              <div class="select">
+                {{#power-select options=filterTypes searchField="name" disabled=searchActive selected=filterType onchange=(action (mut filterType))
+                as |filterType|}}
+                  {{filterType.name}}
+                {{/power-select}}
+              </div>
+            </div>
+          {{/if}}
+          {{#if displayTypes.length}}
+            <div class="filter view">
+              <div class="select">
+                {{#power-select options=displayTypes searchField="name" selected=displayType onchange=(action (mut displayType)) as |displayType|}}
+                  {{displayType.name}}
+                {{/power-select}}
+              </div>
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
+    {{/unless}}
   </div>
 
-  <div class="shadow clearfix">
-    <span></span>
-  </div>
+  {{#unless disableShadow}}
+    <div class="shadow clearfix">
+      <span></span>
+    </div>
+  {{/unless}}
 
   <div class="content">
     {{#if searchActive}}
-      {{#if searchLoading}}
-        <div class="loading">
-          <i class="fa fa-circle-o-notch fa-spin"></i>
-        </div>
-      {{else}}
-        {{#if goodSearchString}}
+      {{#unless disableSearch}}
+        {{#if searchLoading}}
+          <div class="loading">
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+          </div>
+        {{else}}
+          {{#if goodSearchString}}
+            <ul>
+              {{#each pagedResults as |result|}}
+                <li class="aet {{if (eq target result.id) 'selected'}}" onclick={{action "activateItem" result}}>
+                  {{search-result model=result config=config beforeComponent=beforeComponent afterComponent=afterComponent
+                  tooltipNode=tooltipNode tooltipLabel=tooltipLabel labelPropertyPath=labelPropertyPath clickItem="clickItem"}}
+                </li>
+              {{else}}
+                <li class="no-results">No results found for <span>{{searchQuery}}</span></li>
+              {{/each}}
+            </ul>
+            {{#if searchExtraItemsLoading}}
+              <div class="loading">
+                <i class="fa fa-circle-o-notch fa-spin"></i>
+              </div>
+            {{/if}}
+            {{#if canLoadMore}}
+              <span class="load-more" title={{tooltipLoadMore}} {{action "loadMore"}}>Load more</span>
+            {{/if}}
+          {{else}}
+            <div class="info-message">Please type a search string of <span class="highlight">at least 3 characters</span> or <span class="action-link" {{action "returnToHierarchy"}}>return to the hierarchy view</span></div>
+          {{/if}}
+        {{/if}}
+      {{/unless}}
+    {{else}}
+      {{#if safeHierarchyMessage}}
+        {{safeHierarchyMessage}}
+      {{/if}}
+      {{#if showHierarchy}}
+        {{#if (is-pending topConcepts)}}
+          <div class="loading">
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+          </div>
+        {{else}}
           <ul>
-            {{#each pagedResults as |result|}}
-              <li class="aet {{if (eq target result.id) 'selected'}}" onclick={{action "activateItem" result}}>
-                {{search-result model=result config=config beforeComponent=beforeComponent afterComponent=afterComponent
-                tooltipNode=tooltipNode tooltipLabel=tooltipLabel labelPropertyPath=labelPropertyPath clickItem="clickItem"}}
-              </li>
-            {{else}}
-              <li class="no-results">No results found for <span>{{searchQuery}}</span></li>
+            {{#each (await topConcepts) as |top index|}}
+              {{#if top.hasChildren}}
+                {{async-expanding-tree model=top config=config fetchChildrenOnInit=true selected=target selectOlderBrother="selectOlderBrother"
+                selectYoungerBrother="selectYoungerBrother" sortchildrenby=sortKey index=index disableShortcuts=disableShortcuts
+                activateItem="activateItem"}}
+              {{/if}}
             {{/each}}
           </ul>
-          {{#if searchExtraItemsLoading}}
-            <div class="loading">
-              <i class="fa fa-circle-o-notch fa-spin"></i>
-            </div>
-          {{/if}}
-          {{#if canLoadMore}}
-            <span class="load-more" title={{tooltipLoadMore}} {{action "loadMore"}}>Load more</span>
-          {{/if}}
-        {{else}}
-          <div class="info-message">Please type a search string of <span class="highlight">at least 3 characters</span> or <span class="action-link" {{action "returnToHierarchy"}}>return to the hierarchy view</span></div>
         {{/if}}
-      {{/if}}
-    {{else}}
-      {{#if (is-pending topConcepts)}}
-        <div class="loading">
-          <i class="fa fa-circle-o-notch fa-spin"></i>
-        </div>
-      {{else}}
-        <ul>
-          {{#each (await topConcepts) as |top index|}}
-            {{#if top.hasChildren}}
-              {{async-expanding-tree model=top config=config fetchChildrenOnInit=true selected=target selectOlderBrother="selectOlderBrother"
-              selectYoungerBrother="selectYoungerBrother" sortchildrenby=sortKey index=index disableShortcuts=disableShortcuts}}
-            {{/if}}
-          {{/each}}
-        </ul>
       {{/if}}
     {{/if}}
   </div>

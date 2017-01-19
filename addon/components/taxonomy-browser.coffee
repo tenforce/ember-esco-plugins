@@ -3,7 +3,6 @@
 `import KeyboardShortcuts from 'ember-keyboard-shortcuts/mixins/component';`
 `import layout from '../templates/components/taxonomy-browser'`
 `import TooltipManager from 'ember-async-expanding-tree/mixins/tooltip-manager';`
-
 ###
 # component to browse and search taxonomies as defined in ESCO
 ###
@@ -47,7 +46,8 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     @get('language') || @get('taxonomy.locale') || @get('defaultLanguage')
 
   # the target concept being focused on in the hierarchy
-  target: Ember.computed.alias 'hierarchyService.target'
+  target: Ember.computed 'hierarchyService.target', ->
+    @get('hierarchyService.target')
 
   init: ->
     @_super(arguments...)
@@ -181,6 +181,14 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     @get 'filterType'
     @notifyPropertyChange 'topConcepts'
 
+  # whether the hierarchy component should be shown
+  showHierarchy: true
+
+  # message displayed above hierarchy (even when the hierarchy is hidden)
+  hierarchyMessage: undefined
+  safeHierarchyMessage: Ember.computed 'hierarchyMessage', ->
+    return Ember.String.htmlSafe(@get('hierarchyMessage'))
+
   config: Ember.computed 'baseConfig', 'defaultExpanded', 'taxonomy', 'displayType', 'filterType', ->
     filter = @get 'filterType'
     display = @get 'displayType'
@@ -210,7 +218,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   ).on('init')
 
   # which concepts are to be expanded automatically
-  expanded: Ember.computed 'target','displayType', ->
+  expanded: Ember.computed 'target', 'displayType', ->
     target = @get 'target'
     display = @get 'displayType'
     filter = @get 'filterType'
@@ -373,16 +381,17 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
           resolve(
             [
               {
-                name: "List"
-                type: "list"
-                id: "list"
-              },
-              {
                 name: taxonomy.get('preflabel')
                 type: "hierarchy"
                 default: true
                 id: taxonomy.get('id')
-              }])
+              },
+              {
+                name: "List"
+                type: "list"
+                id: "list"
+              }
+              ])
       else
         resolve(
           [{
@@ -401,6 +410,10 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
       Ember.computed 'labelPropertyPath', 'model', key, ->
         @get("model.#{@get('labelPropertyPath')}")
   ).on('init')
+
+  disableSearch: false
+  disableFilters: false
+  disableShadow: false
 
   actions:
     up: ->
@@ -436,5 +449,8 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
         if child?.get('hasChildren') then @sendAction 'activateItem', child
     deleteSearchString: ->
       @set('searchString', '')
+    cancelSearch: ->
+      @set('searchString', '')
+      @set 'displayType', @get 'defaultDisplayType'
 
 `export default TaxonomyBrowserComponent`
