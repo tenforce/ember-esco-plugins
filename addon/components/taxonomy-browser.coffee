@@ -222,10 +222,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   ).on('init')
 
   # which concepts are to be expanded automatically
-  expanded: Ember.computed 'target', 'displayType', 'hierarchyService.loading', ->
-    console.log "loading : "+@get('hierarchyService.loading')
-    console.log "target : "+@get('hierarchyService.target')
-    if @get('hierarchyService.loading') is true then return null
+  expanded: Ember.computed 'target', 'displayType', ->
     target = @get 'target'
     display = @get 'displayType'
     filter = @get 'filterType'
@@ -237,7 +234,8 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     else
       null
 
-  expandedObserver: Ember.observer 'expanded', ( ->
+  expandedObserver: Ember.observer 'expanded', 'targetLoading', ( ->
+    if @get('targetLoading') is true then return null
     if not @get('defaultExpanded')
       @get('expanded')?.then (result) =>
         @set 'defaultExpanded', result
