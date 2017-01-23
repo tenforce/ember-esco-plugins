@@ -1,6 +1,6 @@
 {
   "name": "ember-esco-plugins",
-  "version": "3.0.4",
+  "version": "3.0.3",
   "description": "A collection of useful ESCO utilities and components for use in the different platform frontends.",
   "directories": {
     "doc": "doc",
@@ -20,8 +20,8 @@
   "devDependencies": {
     "broccoli-asset-rev": "^2.2.0",
     "ember-ajax": "0.7.1",
-    "ember-keyboard-shortcuts": "0.3.0",
-    "ember-async-expanding-tree": "git+ssh://git@git.tenforce.com:ember/async-expanding-tree.git#v1.1.17",
+    "ember-keyboard-shortcuts": "https://github.com/asjongers/ember-keyboard-shortcuts.git#v0.3.6",
+    "ember-async-expanding-tree": "git+ssh://git@git.tenforce.com:ember/async-expanding-tree.git#v1.1.18",
     "ember-cli": "2.3.0-beta.1",
     "ember-cli-app-version": "^1.0.0",
     "ember-cli-dependency-checker": "^1.2.0",
@@ -45,8 +45,8 @@
   ],
   "dependencies": {
     "ember-cli-babel": "^5.1.5",
-    "ember-keyboard-shortcuts": "0.3.0",
-    "ember-async-expanding-tree": "git+ssh://git@git.tenforce.com:ember/async-expanding-tree.git#v1.1.17",
+    "ember-keyboard-shortcuts": "https://github.com/asjongers/ember-keyboard-shortcuts.git#v0.3.6",
+    "ember-async-expanding-tree": "git+ssh://git@git.tenforce.com:ember/async-expanding-tree.git#v1.1.18",
     "ember-cli-htmlbars": "^1.0.1",
     "ember-cli-coffeescript": "1.13.2",
     "ember-promise-helpers": "1.0.1"
