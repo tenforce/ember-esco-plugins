@@ -8,7 +8,8 @@ HierarchyService = Ember.Service.extend
   _cacheCall: (call, promise) ->
     cache = @get 'cache'
     cache[call] = promise
-    
+  _clearCache: ->
+    @set('cache', {})  
   _performCall: (call, uncache) ->
     promise = @_fetchCached(call)
     if uncache or not promise
