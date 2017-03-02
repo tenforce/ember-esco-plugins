@@ -160,7 +160,10 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
       sortByPromise(children,@get('sortKey'))
 
   # how to sort the top concepts
-  sortKey: ["defaultCode", "preflabel"]
+  sortBy: ["defaultCode", "preflabel"]
+  sortKey: Ember.computed 'sortBy', ->
+    console.warn("'sortKey' is deprecated, please use 'sortBy' instead")
+    @get('sortBy')
 
   # the default display type to use
   defaultDisplayType: Ember.computed 'displayTypes', ->
@@ -194,11 +197,12 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     return Ember.String.htmlSafe(@get('hierarchyMessage'))
 
   config: Ember.computed 'baseConfig', 'defaultExpanded', 'taxonomy', 'displayType', 'filterType', ->
+    if @get('baseConfig.sortKey') then console.warn("'sortKey' is deprecated, please use 'sortBy' instead")
     filter = @get 'filterType'
     display = @get 'displayType'
     base = @get 'baseConfig' or {}
     def = Ember.Object.create
-      sortBy: @get('sortKey')
+      sortBy: @get('sortBy')
       expandedConcepts: @get('defaultExpanded') or []
       getChildren: (model) =>
         # TODO : Refactor this into something more... you know, not-demonspawn-like
