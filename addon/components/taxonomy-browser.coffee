@@ -197,16 +197,20 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     filter = @get 'filterType'
     display = @get 'displayType'
     base = @get 'baseConfig' or {}
-    Ember.Object.create base,
+    def = Ember.Object.create
       sortBy: @get('sortKey')
       expandedConcepts: @get('defaultExpanded') or []
       getChildren: (model) =>
+        # TODO : Refactor this into something more... you know, not-demonspawn-like
         @fetchChildren(display.id, model.get('id'), filter).then (children) =>
           if Ember.get(children, 'length') > 0
             model.set('anyChildren', true)
           else
             model.set('anyChildren', false)
           children
+    # deep-merge of both configs where the base one gets the final say
+    merged = $.extend({}, def, base)
+    return merged
 
   # validate the search string, has to have at least 2 characters
   goodSearchString: Ember.computed 'searchQuery', ->
