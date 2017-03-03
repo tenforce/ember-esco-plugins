@@ -38,12 +38,19 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
 
 
   # Language to show the tree in
+  # NB : Should be specified as a parameter if other than English, following the default structure
   language: undefined
-  defaultLanguage: "en"
+  defaultLanguage: {title: "English", id: "en"}
 
   # Language used to search
-  searchLanguage: Ember.computed 'taxonomy.locale', 'language', ->
-    @get('language') || @get('taxonomy.locale') || @get('defaultLanguage')
+  # NB : taxonomy.local should follow the following structure : {title: "English", id: "en"}
+  searchLanguage: Ember.computed 'taxonomy.locale.id', 'language.id', 'defaultLanguage.id', ->
+    @get('language.id') || @get('taxonomy.locale.id') || @get('defaultLanguage.id')
+  # Language to display when nothing found
+  titleLanguage: Ember.computed 'taxonomy.locale.title', 'language.title', 'defaultLanguage.title', ->
+    @get('language.title') || @get('taxonomy.locale.title') || @get('defaultLanguage.title')
+  # NB : As the titleLanguage will change if an user changes the language, we need to keep track of what language the query was sent with
+  latestTitleLanguage: undefined
 
   # the target concept being focused on in the hierarchy
   target: Ember.computed 'hierarchyService.target', ->
@@ -304,6 +311,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   # always also search in english
   _getSearchResults: (query) ->
     promises = []
+    @set('latestTitleLanguage', @get('titleLanguage'))
     promises.push Ember.$.ajax
       url: '/indexer/search/textSearch',
       type: 'GET',

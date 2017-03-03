@@ -62,7 +62,7 @@
                   tooltipNode=tooltipNode tooltipLabel=tooltipLabel labelPropertyPath=labelPropertyPath clickItem="clickItem"}}
                 </li>
               {{else}}
-                <li class="no-results">No results found for <span>{{searchQuery}}</span></li>
+                <li class="no-results">No results found for <span class="search query">{{searchQuery}}</span> in <span class="search language">{{latestTitleLanguage}}</span></li>
               {{/each}}
             </ul>
             {{#if searchExtraItemsLoading}}
