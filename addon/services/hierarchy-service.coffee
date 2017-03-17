@@ -9,31 +9,40 @@ HierarchyService = Ember.Service.extend
     cache = @get 'cache'
     cache[call] = promise
   _clearCache: ->
-    @set('cache', {})  
+    @set('cache', {})
   _performCall: (call, uncache) ->
     promise = @_fetchCached(call)
     if uncache or not promise
       promise = new Ember.RSVP.Promise (resolve, reject) =>
-        Ember.$.ajax call,
-          headers:
-            'Accept': 'application/json'
-          success: resolve
-          error: reject
+        internalCall = (count) ->
+          Ember.$.ajax call,
+            headers:
+              'Accept': 'application/json'
+            success: resolve
+            error: =>
+              if count < 5
+                console.log "Call to HierarchyService for #{call} failed, retrying"
+                internalCall(count + 1)
+              else reject
+
+
+        internalCall 0
+
     @_cacheCall(call, promise)
     promise
 
   getAncestors: (display, target, uncache) ->
     call = "/hierarchy/#{display}/ancestors/#{target}"
     @_performCall(call,uncache)
-    
+
   getChildren: (display, target, filter, uncache) ->
     subcall = ""
     if filter and filter.id
       subcall = "?filter=#{filter.id}"
       for key, value of (filter.params or {})
         subcall += "&filter-"+key+"="+value
-    
-    call = "/hierarchy/#{display}/target/#{target}"+subcall 
+
+    call = "/hierarchy/#{display}/target/#{target}"+subcall
     @_performCall(call,uncache)
 
 `export default HierarchyService`
