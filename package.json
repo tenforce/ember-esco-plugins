@@ -1,6 +1,6 @@
 {
   "name": "ember-esco-plugins",
-  "version": "3.0.11",
+  "version": "3.0.12",
   "description": "A collection of useful ESCO utilities and components for use in the different platform frontends.",
   "directories": {
     "doc": "doc",
