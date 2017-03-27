@@ -116,7 +116,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   searchActive: false
 
   included: Ember.computed 'baseConfig.included', ->
-    @get('baseConfig.included') or 'pref-labels.pref-label-of'
+    @get('baseConfig.included') or 'pref-labels.pref-label-of,has-publication-status'
 
   # ensures the list view is shown when searching
   ensureListWhenSearching: Ember.observer 'searchActive', 'displayTypes', ->
