@@ -179,11 +179,12 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     displays?.map (item) ->
       if Ember.get item, 'default'
         selected = item
-    selected
+    selected || displays?[0]
 
   # when the display type changes, make sure the search stops in hierarchy mode
   displayTypeObserver: Ember.observer 'displayType', ->
     if @get('displayType.type') == "hierarchy"
+      @notifyPropertyChange 'topConcepts'
       @set 'searchActive', false
     else
       @set 'filterType', @filterTypes[0]
@@ -387,6 +388,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
             hierarchyDescriptions = structures.map (item,index) ->
               name: item.get('name')
               type: "hierarchy"
+              default: item.get('default')
               id: item.get('id')
             hierarchyDescriptions.push
               name: "List"
@@ -395,7 +397,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
             hierarchyDescriptions.push
               name: taxonomy.get('preflabel')
               type: "hierarchy"
-              default: true
               id: taxonomy.get('id')
             resolve(hierarchyDescriptions)
         else
