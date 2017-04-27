@@ -405,7 +405,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
               {
                 name: taxonomy.get('preflabel')
                 type: "hierarchy"
-                default: true
                 id: taxonomy.get('id')
               },
               {
