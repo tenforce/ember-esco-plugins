@@ -82,6 +82,9 @@
       {{#if safeHierarchyMessage}}
         {{safeHierarchyMessage}}
       {{/if}}
+      {{#if hierarchyComponent}}
+        {{component hierarchyComponent}}
+      {{/if}}
       {{#if showHierarchy}}
         {{#if (is-pending topConcepts)}}
           <div class="loading">

@@ -204,6 +204,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   safeHierarchyMessage: Ember.computed 'hierarchyMessage', ->
     return Ember.String.htmlSafe(@get('hierarchyMessage'))
 
+  # will display component with specified name if not empty (and not during searches)
+  hierarchyComponent: undefined
+
   config: Ember.computed 'baseConfig', 'defaultExpanded', 'taxonomy', 'displayType', 'filterType', ->
     if @get('baseConfig.sortKey') then console.warn("'sortKey' is deprecated, please use 'sortBy' instead")
     filter = @get 'filterType'
