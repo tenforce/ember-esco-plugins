@@ -189,7 +189,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     else
       @set 'filterType', @filterTypes[0]
       @set 'searchActive', true
-      @performSearch(@get('searchQuery'), true, true)
 
   # when filtering make sure the top concepts are computed again so the tree is rerendered
   filterTypeObserver: Ember.observer 'filterType', ->
