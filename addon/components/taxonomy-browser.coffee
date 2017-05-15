@@ -265,6 +265,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     @set 'searchQuery', query
     if @get 'goodSearchString'
       if reinitialize
+        @set 'searchResults', []
         @set 'maxPage', 0
         @set 'searchActive', true
         @set 'searchLoading', true
