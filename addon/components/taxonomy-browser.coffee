@@ -33,6 +33,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   # page size for hierarchy
   pageSize: 15
 
+  # chunk size when fetching concepts (lower means smaller response size)
+  chunkSize: 5
+
   fetchSize: Ember.computed 'pageSize', 'maxPage', ->
     (@get('maxPage')+1)*@get('pageSize')
 
@@ -141,7 +144,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
         idslists[listIndex].push node.id
       promises = []
       idslists.forEach (list) =>
-        chunksize=10
+        chunksize= @get('chunkSize')
         i=0
         while i < list.length
           temp = list.slice(i, i+chunksize)
@@ -357,7 +360,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   _fetchConcepts: (list) ->
     promises=[]
     arr = []
-    chunksize=10
+    chunksize= @get('chunkSize')
     i=0
     while i < list.length
       temp = list.slice(i, i+chunksize)
