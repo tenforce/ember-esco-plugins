@@ -396,7 +396,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
           taxonomy?.get('structures').then (structures) =>
             # removing disabled structures
             structures = structures.filter (struct) ->
-              if struct.get('disable') then return false
+              if struct.get('disabled') then return false
               return true
             hierarchyDescriptions = structures.map (item,index) ->
               name: item.get('name')
