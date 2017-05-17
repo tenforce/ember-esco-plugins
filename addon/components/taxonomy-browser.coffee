@@ -390,7 +390,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   addPillarHierarchy: true
   # fetches the hierarchies for a given taxonomy and adds the default hierarchies too
   fetchHierarchies: (taxonomy) ->
-    new Ember.RSVP.Promise (resolve, reject) ->
+    new Ember.RSVP.Promise (resolve, reject) =>
       if taxonomy
         if taxonomy.get('structures').then
           taxonomy?.get('structures').then (structures) =>
