@@ -386,40 +386,45 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   canLoadMore: Ember.computed 'searchResults', 'maxIndex', ->
     @get('searchResults').length > @get('maxIndex')-2
 
+  # whether we should add a default hierarchy for the pillar (the hierarchy service will decide what to do) in the structures list
+  addPillarHierarchy: true
   # fetches the hierarchies for a given taxonomy and adds the default hierarchies too
   fetchHierarchies: (taxonomy) ->
     new Ember.RSVP.Promise (resolve, reject) ->
       if taxonomy
         if taxonomy.get('structures').then
           taxonomy?.get('structures').then (structures) =>
+            # removing disabled structures
+            structures = structures.filter (struct) ->
+              if struct.get('disable') then return false
+              return true
             hierarchyDescriptions = structures.map (item,index) ->
               name: item.get('name')
               type: "hierarchy"
               default: item.get('default')
               id: item.get('id')
+            if @get('addPillarHierarchy')
+              hierarchyDescriptions.push
+                name: taxonomy.get('preflabel')
+                type: "hierarchy"
+                id: taxonomy.get('id')
             hierarchyDescriptions.push
               name: "List"
               type: "list"
               id: "list"
+            resolve(hierarchyDescriptions)
+        else
+          hierarchyDescriptions = []
+          if @get('addPillarHierarchy')
             hierarchyDescriptions.push
               name: taxonomy.get('preflabel')
               type: "hierarchy"
               id: taxonomy.get('id')
-            resolve(hierarchyDescriptions)
-        else
-          resolve(
-            [
-              {
-                name: taxonomy.get('preflabel')
-                type: "hierarchy"
-                id: taxonomy.get('id')
-              },
-              {
-                name: "List"
-                type: "list"
-                id: "list"
-              }
-              ])
+          hierarchyDescriptions.push
+            name: "List"
+            type: "list"
+            id: "list"
+          resolve(hierarchyDescriptions)
       else
         resolve(
           [{
