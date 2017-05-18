@@ -164,13 +164,13 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
         Ember.ArrayProxy.create(content: result)
 
   # the top concepts of the taxonomy
-  topConcepts: Ember.computed 'taxonomy', 'taxonomy.children', 'sortBy', 'defaultExpanded', ->
+  topConcepts: Ember.computed 'taxonomy', 'taxonomy.children', 'config.sortBy', 'defaultExpanded', ->
     @get('taxonomy.children')?.then (children) =>
       children.forEach (child) ->
         child.set('anyChildren', true)
-      sortByPromise(children,@get('sortBy'))
+      sortByPromise(children,@get('config.sortBy'))
 
-  # how to sort the top concepts
+  # how to sort the top concepts. do note it might get overridden in 'config'
   sortBy: ["defaultCode", "preflabel"]
   sortKey: Ember.computed 'sortBy', ->
     console.warn("'sortKey' is deprecated, please use 'sortBy' instead")
