@@ -163,12 +163,11 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
             result.push item
         Ember.ArrayProxy.create(content: result)
 
-  # the top concepts of the taxonomy
-  topConcepts: Ember.computed 'taxonomy', 'taxonomy.children', 'config.sortBy', 'defaultExpanded', ->
-    @get('taxonomy.children')?.then (children) =>
-      children.forEach (child) ->
-        child.set('anyChildren', true)
-      sortByPromise(children,@get('config.sortBy'))
+  # the top concepts of the current structure
+  topConcepts: Ember.computed 'displayType', 'taxonomy', 'taxonomy.children', 'config.sortBy', 'defaultExpanded', ->
+    @get('hierarchyService').getTopConcepts(@get 'displayType.id').then (tops) =>
+      @_fetchConcepts(@_getIdsFromResultSet(tops?.data)).then (concepts) =>
+        sortByPromise(concepts,@get('config.sortBy'))
 
   # how to sort the top concepts. do note it might get overridden in 'config'
   sortBy: ["defaultCode", "preflabel"]
@@ -348,12 +347,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
       []
 
   _getIdsFromResultSet: (data) ->
-    # uuid of the conceptscheme
-    searchOrigin = @get('taxonomy.id')
-    filtered = data.filter (element) =>
-      element?.conceptSchemes?.indexOf(searchOrigin) >= 0
-
-    ids = filtered.map (item) ->
+    ids = data.map (item) ->
       item.id
     return ids
 

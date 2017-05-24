@@ -45,4 +45,8 @@ HierarchyService = Ember.Service.extend
     call = "/hierarchy/#{display}/target/#{target}"+subcall
     @_performCall(call,uncache)
 
+  getTopConcepts: (display, uncache) ->
+    call = "/structure/#{display}/top-concepts"
+    @_performCall(call,uncache)
+
 `export default HierarchyService`
