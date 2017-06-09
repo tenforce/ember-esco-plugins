@@ -32,7 +32,7 @@ HierarchyService = Ember.Service.extend
     promise
 
   getAncestors: (display, target, uncache) ->
-    call = "/hierarchy/#{display}/ancestors/#{target}"
+    call = "/hierarchy/#{display}/#{target}/ancestors"
     @_performCall(call,uncache)
 
   getChildren: (display, target, filter, uncache) ->
@@ -42,7 +42,7 @@ HierarchyService = Ember.Service.extend
       for key, value of (filter.params or {})
         subcall += "&filter-"+key+"="+value
 
-    call = "/hierarchy/#{display}/target/#{target}"+subcall
+    call = "/hierarchy/#{display}/#{target}/descendants"+subcall
     @_performCall(call,uncache)
 
   getTopConcepts: (display, uncache) ->
