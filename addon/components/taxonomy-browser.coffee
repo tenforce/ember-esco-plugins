@@ -223,7 +223,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
           if Ember.get(children, 'length') > 0
             model.set('anyChildren', true)
           else
-            model.set('anyChildren', false)
+            model.set('anyChildren', true)
           children
     # deep-merge of both configs where the base one gets the final say
     merged = $.extend({}, def, base)
