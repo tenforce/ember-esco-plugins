@@ -167,7 +167,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
   topConcepts: Ember.computed 'displayType', 'taxonomy', 'taxonomy.children', 'config.sortBy', 'defaultExpanded', ->
     @get('hierarchyService').getTopConcepts(@get 'displayType.id').then (tops) =>
       @_fetchConcepts(@_getIdsFromResultSet(tops?.data)).then (concepts) =>
-        sortByPromise(concepts,@get('config.sortBy'))
+        concepts.forEach((concept) ->
+          concept.set('anyChildren', true))
+        sortByPromise(concepts, @get('config.sortBy'))
 
   # how to sort the top concepts. do note it might get overridden in 'config'
   sortBy: ["defaultCode", "preflabel"]
@@ -223,7 +225,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
           if Ember.get(children, 'length') > 0
             model.set('anyChildren', true)
           else
-            model.set('anyChildren', true)
+            model.set('anyChildren', false)
           children
     # deep-merge of both configs where the base one gets the final say
     merged = $.extend({}, def, base)
