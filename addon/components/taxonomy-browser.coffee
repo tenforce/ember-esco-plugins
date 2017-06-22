@@ -68,8 +68,8 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
 
   # Title text for filter on mouse over
   filterTitle: Ember.computed 'showFilter', ->
-    if @get('showFilter') then return "hide options"
-    else return "more options"
+    if @get('showFilter') then return "Hide options"
+    else return "More options"
 
   activateNode: (node) ->
     @sendAction 'activateItem', node
