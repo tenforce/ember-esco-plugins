@@ -326,7 +326,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
       url: '/indexer/search/textSearch',
       type: 'GET',
       data: {
-        'conceptScheme': @get('taxonomy.id'),
+        'conceptScheme': if @get('displayType.id') != "list" then @get('displayType.id') else @get('taxonomy.id'),
         'locale': @get('searchLanguage'),
         'text': query,
         'numberOfResults': @get('fetchSize')+1
