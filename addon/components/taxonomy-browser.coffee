@@ -188,6 +188,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
 
   # when the display type changes, make sure the search stops in hierarchy mode
   displayTypeObserver: Ember.observer 'displayType', ->
+    @get('hierarchyService').set('selectedHierarchy', @get('displayType'))
     if @get('displayType.type') == "hierarchy"
       @notifyPropertyChange 'topConcepts'
       @set 'searchActive', false
