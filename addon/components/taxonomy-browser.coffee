@@ -122,17 +122,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     unless @get('config.included') then return 'pref-labels.pref-label-of'
     @get('config.included')?.join(',') or undefined
 
-  # ensures the list view is shown when searching
-  ensureListWhenSearching: Ember.observer 'searchActive', 'displayTypes', ->
-    Ember.run.later =>
-      if @get 'searchActive'
-        listType = null
-        @get('displayTypes')?.map (display) ->
-          if display.type == "list"
-            listType = display
-        if listType
-          @set 'displayType', listType
-
   # fetching the children of the current node
   fetchChildren: (display, target, filter, uncache) ->
     filter = @get('filterType')
@@ -405,10 +394,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
                 name: taxonomy.get('preflabel')
                 type: "hierarchy"
                 id: taxonomy.get('id')
-            hierarchyDescriptions.push
-              name: "List"
-              type: "list"
-              id: "list"
             resolve(hierarchyDescriptions)
         else
           hierarchyDescriptions = []
@@ -417,18 +402,10 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
               name: taxonomy.get('preflabel')
               type: "hierarchy"
               id: taxonomy.get('id')
-          hierarchyDescriptions.push
-            name: "List"
-            type: "list"
-            id: "list"
           resolve(hierarchyDescriptions)
       else
         resolve(
-          [{
-            name: "List"
-            type: "list"
-            id: "list"
-          }])
+          [])
 
   labelPropertyPath: Ember.computed.alias 'config.labelPropertyPath'
   beforeComponent: Ember.computed.alias 'config.beforeComponent'
