@@ -134,9 +134,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
           @set 'displayType', listType
 
   # fetching the children of the current node
-  fetchChildren: (display, target, filter) ->
+  fetchChildren: (display, target, filter, uncache) ->
     filter = @get('filterType')
-    @get('hierarchyService').getChildren(display,target, filter).then (result) =>
+    @get('hierarchyService').getChildren(display,target, filter, uncache).then (result) =>
       idslists = []
       result.data.map (node, index) =>
         listIndex = Math.floor(index / 40)
@@ -219,9 +219,9 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     def = Ember.Object.create
       sortBy: @get('sortBy')
       expandedConcepts: @get('defaultExpanded') or []
-      getChildren: (model) =>
+      getChildren: (model, uncache) =>
         # TODO : Refactor this into something more... you know, not-demonspawn-like
-        @fetchChildren(display.id, model.get('id'), filter).then (children) =>
+        @fetchChildren(display.id, model.get('id'), filter, uncache).then (children) =>
           if Ember.get(children, 'length') > 0
             model.set('anyChildren', true)
           else
