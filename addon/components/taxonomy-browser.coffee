@@ -440,8 +440,6 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
     toggleFilter: ->
       @set 'showFilter', not @get 'showFilter'
       false
-    returnToHierarchy: ->
-      @set 'displayType', @get 'defaultDisplayType'
     loadMore: ->
       @incrementProperty 'maxPage'
       @performSearch(@get('searchQuery'), false, false)
@@ -458,6 +456,7 @@ TaxonomyBrowserComponent = Ember.Component.extend KeyboardShortcuts, TooltipMana
       @set('searchString', '')
     cancelSearch: ->
       @set('searchString', '')
-      @set 'displayType', @get 'defaultDisplayType'
+      @set('searchLoading', false)
+      @set('searchActive', false)
 
 `export default TaxonomyBrowserComponent`
