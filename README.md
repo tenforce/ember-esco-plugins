@@ -48,4 +48,4 @@ Filters have to be passed into the taxonomy browser:
 ID is the uuid of the filter specification to use. Filter specifications are described in the hierarchy micro service. Params is a hash of parameters to be passed in to the hierarchy filter call where the key is the name of the parameter and the value the value.
 
 ## Usage
-ember install git+ssh://git@git.tenforce.com:esco/ember-esco-plugins.git
+ember install git+ssh://git@github.com:tenforce/ember-async-expanding-tree.git
